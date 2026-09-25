@@ -115,7 +115,7 @@ export default function Home() {
           <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {featured.map((d) => (
               <li key={d.id}>
-                <Link href="/destinations" className="group block overflow-hidden rounded-3xl bg-white shadow-[0_8px_30px_-12px_rgba(11,37,69,0.25)] ring-1 ring-slate-200/70 transition hover:-translate-y-1">
+                <Link href={`/destinations/${d.id}`} className="group block overflow-hidden rounded-3xl bg-white shadow-[0_8px_30px_-12px_rgba(11,37,69,0.25)] ring-1 ring-slate-200/70 transition hover:-translate-y-1">
                   <DestPhoto id={d.id} alt={d.name} className="h-48" />
                   <div className="flex items-center justify-between gap-3 p-4">
                     <div>

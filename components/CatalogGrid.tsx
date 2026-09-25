@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import { DestPhoto, PinIcon } from "./brand";
+import { ArrowRight, DestPhoto, PinIcon } from "./brand";
 import { inr, TYPE_EMOJI, TYPE_LABELS } from "@/lib/format";
 import { DEST_TYPES, type Destination, type DestType } from "@/lib/types";
 
@@ -36,7 +37,11 @@ export function CatalogGrid({ destinations }: { destinations: Destination[] }) {
       </div>
       <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {shown.map((d) => (
-          <li key={d.id} className="overflow-hidden rounded-3xl bg-white shadow-[0_8px_30px_-12px_rgba(11,37,69,0.25)] ring-1 ring-slate-200/70">
+          <li key={d.id}>
+            <Link
+              href={`/destinations/${d.id}`}
+              className="group block h-full overflow-hidden rounded-3xl bg-white shadow-[0_8px_30px_-12px_rgba(11,37,69,0.25)] ring-1 ring-slate-200/70 transition hover:-translate-y-1"
+            >
             <DestPhoto id={d.id} alt={d.name} className="h-44" />
             <div className="space-y-2 p-4">
               <div className="flex items-start justify-between gap-2">
@@ -64,7 +69,11 @@ export function CatalogGrid({ destinations }: { destinations: Destination[] }) {
                   <dd className="font-semibold text-ink">{d.bestMonths.map((m) => MONTHS[m - 1]).join(", ")}</dd>
                 </div>
               </dl>
+              <p className="flex items-center gap-1 pt-1 text-sm font-semibold text-brand-700">
+                View details <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+              </p>
             </div>
+            </Link>
           </li>
         ))}
       </ul>
