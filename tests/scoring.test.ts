@@ -173,7 +173,7 @@ describe("component points", () => {
   });
   it("travel time", () => {
     expect(travelPoints(1)).toBe(100);
-    expect(travelPoints(9)).toBe(50);
+    expect(travelPoints(7)).toBe(50);
     expect(travelPoints(20)).toBe(0);
   });
 });
@@ -183,9 +183,9 @@ describe("personFit", () => {
     const window = { start: "2026-11-10", end: "2026-11-12" };
     const f = personFit(dest(), person(), window, trip);
     // budget: 10k of 20k = 50% headroom -> 100; type: 1st -> 100;
-    // travel: 4h -> 86; season: all November -> 100
-    expect(f.parts).toEqual({ budget: 100, type: 100, travel: 86, season: 100 });
-    expect(f.fit).toBe(Math.round(30 + 35 + 0.2 * 86 + 15));
+    // travel: 4h -> 75; season: all November -> 100
+    expect(f.parts).toEqual({ budget: 100, type: 100, travel: 75, season: 100 });
+    expect(f.fit).toBe(Math.round(30 + 35 + 0.2 * 75 + 15));
   });
 });
 

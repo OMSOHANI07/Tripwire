@@ -339,9 +339,9 @@ export function typePoints(types: DestType[], ranking: DestType[]): number {
   return best;
 }
 
-/** Travel hours → 0–100. 2h or less = 100, 16h or more = 0, linear between. */
+/** Travel hours → 0–100. 1h or less = 100, 13h or more = 0, linear between. */
 export function travelPoints(hours: number): number {
-  return Math.round(clamp(100 * (1 - (hours - 2) / 14)));
+  return Math.round(clamp(100 * (1 - (hours - 1) / 12)));
 }
 
 /**

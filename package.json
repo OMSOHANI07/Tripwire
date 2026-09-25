@@ -10,14 +10,16 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "gen:seed": "tsx scripts/gen-seed.ts",
-    "seed:demo": "tsx scripts/seed-demo.ts"
+    "seed:demo": "tsx scripts/seed-demo.ts",
+    "seed:catalog": "tsx scripts/seed-catalog.ts"
   },
   "dependencies": {
     "@google/genai": "^2.24.0",
     "@supabase/supabase-js": "^2.117.1",
     "next": "16.3.6",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
