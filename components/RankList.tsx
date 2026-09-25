@@ -39,7 +39,7 @@ export function RankList({ value, onChange }: { value: DestType[]; onChange: (v:
             <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-stone-100 text-sm font-semibold text-stone-700">{i + 1}</span>
             <span aria-hidden className="cursor-grab select-none text-stone-400">⋮⋮</span>
             <span className="flex-1 font-medium">
-              <span aria-hidden>{TYPE_EMOJI[t]} </span>
+              <span aria-hidden className="mr-1.5">{TYPE_EMOJI[t]}</span>
               {TYPE_LABELS[t]}
             </span>
             <button type="button" onClick={() => move(i, i - 1)} disabled={i === 0} aria-label={`Move ${TYPE_LABELS[t]} up`}

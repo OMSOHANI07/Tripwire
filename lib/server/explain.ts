@@ -8,6 +8,8 @@ import { db } from "./supabase";
 import type { TripRow } from "./trips";
 
 export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+/** Bump when the prompt changes so cached explanations are regenerated. */
+const PROMPT_VERSION = 2;
 
 interface CachedExplanations {
   source: "ai" | "template";
@@ -17,7 +19,7 @@ interface CachedExplanations {
 /** Identifies the exact computed results an explanation was written for. */
 export function explanationKey(options: OptionView[]): string {
   const basis = options.map((o) => [o.destinationId, o.groupScore, o.window, o.fits.map((f) => [f.name, f.fit])]);
-  return createHash("sha256").update(JSON.stringify(basis)).digest("hex").slice(0, 32);
+  return createHash("sha256").update(JSON.stringify([PROMPT_VERSION, basis])).digest("hex").slice(0, 32);
 }
 
 /** Cached explanations if they match the current results. */
@@ -62,9 +64,12 @@ function promptFor(options: OptionView[], people: string[]): string {
     `A group of friends (${people.join(", ")}) is choosing a 3–4 day trip in India.`,
     "A deterministic scoring engine already ranked the top options. Fit scores are 0–100 per person;",
     "components are budget headroom, destination-type preference, travel time and season (each 0–100).",
-    "For EACH option write:",
-    '- "why": 2–3 friendly, specific sentences on why it works for this group, citing the numbers.',
-    '- "compromise": one sentence naming who compromises most and on what.',
+    "For EACH option write, in a warm, casual tone a friend would use in a group chat:",
+    '- "why": 2–3 sentences on why it works for this group. Talk in human terms (it\'s cheap, it\'s their favourite',
+    "  kind of trip, short journey, great time of year) and name people. Mention at most two numbers, e.g. the group",
+    "  score or the cost in rupees (write ₹9,000, not INR). Never quote the component scores themselves.",
+    '- "compromise": one sentence naming who compromises most and why, in plain words (e.g. "not really their kind of',
+    '  trip", "a long journey from home"). Use they/them for everyone.',
     "Do not change, re-rank or invent scores, prices or facts. Plain text, no markdown.",
     "",
     JSON.stringify(payload, null, 2),

@@ -292,3 +292,14 @@ describe("tallyVotes", () => {
     expect(t).toMatchObject({ winnerId: "z", totalVotes: 1 });
   });
 });
+
+describe("formatting", async () => {
+  const { formatDeadline, formatRange } = await import("@/lib/format");
+  it("shows deadlines in IST", () => {
+    expect(formatDeadline("2026-09-30T18:29:00Z")).toBe("30 Sep, 11:59 PM");
+  });
+  it("formats date ranges", () => {
+    expect(formatRange("2026-11-18", "2026-11-20")).toBe("18–20 Nov");
+    expect(formatRange("2026-11-30", "2026-12-02")).toBe("30 Nov – 2 Dec");
+  });
+});

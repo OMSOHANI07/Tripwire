@@ -146,9 +146,15 @@ export function PreferenceForm({ tripId, token: urlToken }: Props) {
           <Link href={`/t/${tripId}/results`} className={btn.secondary}>
             Results
           </Link>
-          <button type="button" className={btn.secondary} onClick={() => setDone(null)}>
-            Keep editing
-          </button>
+          {editMode ? (
+            <button type="button" className={btn.secondary} onClick={() => setDone(null)}>
+              Keep editing
+            </button>
+          ) : (
+            <a href={personal} className={btn.secondary}>
+              Edit my answers
+            </a>
+          )}
         </div>
       </div>
     );

@@ -27,7 +27,9 @@ export function formatRange(start: string, end: string): string {
 /** "30 Sep, 11:59 PM" in IST. */
 export function formatDeadline(iso: string): string {
   const dt = new Date(iso);
-  const date = dt.toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: IST });
+  // Shift to IST and read the UTC fields, so it's "30 Sep" in every locale.
+  const ist = new Date(dt.getTime() + 330 * 60000);
+  const date = `${ist.getUTCDate()} ${MONTHS[ist.getUTCMonth()]}`;
   const time = dt
     .toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: IST })
     .toUpperCase();

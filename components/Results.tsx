@@ -134,7 +134,7 @@ function OptionCard({
       <div className="flex flex-wrap gap-1.5">
         {o.types.map((t) => (
           <span key={t} className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-700">
-            <span aria-hidden>{TYPE_EMOJI[t]} </span>
+            <span aria-hidden className="mr-1">{TYPE_EMOJI[t]}</span>
             {TYPE_LABELS[t]}
           </span>
         ))}
@@ -190,13 +190,13 @@ export function StandsGrid({ options, people }: { options: OptionView[]; people:
       <h2 className="font-semibold text-stone-900">Where each person stands</h2>
       <p className="text-sm text-stone-500">Fit for each person, 0–100.</p>
       <div className="mt-4 overflow-x-auto">
-        <table className="w-full border-separate border-spacing-1.5 text-sm">
+        <table className="w-full table-fixed border-separate border-spacing-1 text-sm sm:border-spacing-1.5">
           <caption className="sr-only">Per-person fit scores for each option</caption>
           <thead>
             <tr>
-              <th scope="col" className="text-left font-medium text-stone-500">Person</th>
+              <th scope="col" className="w-[5.5rem] text-left text-xs font-medium text-stone-500 sm:w-28 sm:text-sm">Person</th>
               {options.map((o, i) => (
-                <th key={o.destinationId} scope="col" className="min-w-16 text-center font-semibold text-stone-800">
+                <th key={o.destinationId} scope="col" className="break-words text-center text-xs font-semibold leading-tight text-stone-800 sm:text-sm">
                   <span className="block text-xs font-medium text-stone-500">Option {String.fromCharCode(65 + i)}</span>
                   {o.name.split(" (")[0]}
                 </th>
@@ -206,7 +206,7 @@ export function StandsGrid({ options, people }: { options: OptionView[]; people:
           <tbody>
             {people.map((name) => (
               <tr key={name}>
-                <th scope="row" className="pr-2 text-left font-semibold text-stone-900">{name}</th>
+                <th scope="row" className="truncate pr-1 text-left font-semibold text-stone-900">{name}</th>
                 {options.map((o) => {
                   const f = o.fits.find((x) => x.name === name);
                   const n = f?.fit ?? 0;
@@ -255,18 +255,23 @@ function DateNotes({ notes }: { notes: DateNote[] }) {
   );
 }
 
-function BlockedOption({ o }: { o: OptionView }) {
+function BlockedOption({ o, hideDates }: { o: OptionView; hideDates: boolean }) {
+  const blocks = hideDates ? o.blocks.filter((b) => b.rule !== "dates") : o.blocks;
   return (
     <Card className="space-y-2">
       <div className="flex items-baseline justify-between gap-3">
         <h3 className="text-lg font-bold text-stone-900">{o.name}</h3>
         <span className="text-sm text-stone-500">{inr(o.cost)} / person</span>
       </div>
-      <p className="text-sm font-medium text-stone-800">Blocked by:</p>
+      {blocks.length === 0 ? (
+        <p className="text-sm text-stone-700">Works for everyone apart from the dates.</p>
+      ) : (
+        <p className="text-sm font-medium text-stone-800">{hideDates ? "Also blocked by:" : "Blocked by:"}</p>
+      )}
       <ul className="space-y-1 text-sm">
-        {o.blocks.map((b, i) => (
+        {blocks.map((b, i) => (
           <li key={i} className="flex gap-2 text-stone-700">
-            <span className="shrink-0 rounded bg-red-50 px-1.5 text-xs font-semibold text-red-800">{b.name}</span>
+            <span className="h-fit shrink-0 rounded bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-red-800">{b.name}</span>
             {b.detail}
           </li>
         ))}
@@ -404,8 +409,19 @@ export function ResultsPage({ tripId, token: urlToken }: { tripId: string; token
             Every option breaks at least one person&apos;s hard rule. Here are the closest ones and exactly what blocks each. Someone
             relaxing one rule (and editing before the deadline) could unlock them.
           </Notice>
+          {data.commonWindowCount === 0 && (
+            <Notice tone="error" title={`No ${trip.tripLength}-day stretch works for everyone`}>
+              {(data.closest?.[0]?.blocks ?? [])
+                .filter((b) => b.rule === "dates")
+                .map((b) => b.detail)
+                .join(". ")}
+              . Check the date notes below to see who can&apos;t make what.
+            </Notice>
+          )}
           <div className="space-y-4">
-            {(data.closest ?? []).map((o) => <BlockedOption key={o.destinationId} o={o} />)}
+            {(data.closest ?? []).map((o) => (
+              <BlockedOption key={o.destinationId} o={o} hideDates={data.commonWindowCount === 0} />
+            ))}
           </div>
         </>
       )}
