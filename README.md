@@ -6,6 +6,8 @@ Built with Next.js (App Router) + TypeScript + Tailwind, Supabase Postgres, and 
 
 ## Try it
 
+**Run it locally on a Mac:** double-click `Start Tripwire.command` in the project folder. It installs dependencies if needed, starts the app and opens your browser. You need a filled-in `.env.local` first (see Setup).
+
 - Landing page → **Load demo trip**. This creates a trip with Riya, Siddharth, Karan, Aisha and Preethi, all with different preferences, so the results grid is meaningful. Your browser votes as Riya; the other four personal links are listed under the button.
 - Or from the terminal: `npm run seed:demo` prints the share, results, organizer and personal links.
 
