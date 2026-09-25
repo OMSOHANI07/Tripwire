@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { CopyButton, LinkBox } from "./CopyButton";
 import { btn, Card, Field, input, Notice } from "./ui";
-import { api, links } from "@/lib/client";
+import { api, links, rememberTrip } from "@/lib/client";
 import { formatDeadline } from "@/lib/format";
 
 /** Calendar date in IST, so server and browser agree on the defaults. */
@@ -36,6 +36,7 @@ export function NewTripForm() {
         body: { name, windowStart, windowEnd, tripLength, deadlineDate, deadlineTime, participants: people },
       });
       setCreated(res);
+      rememberTrip({ tripId: res.tripId, organizerKey: res.organizerKey, name });
       window.scrollTo({ top: 0 });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't create the trip");

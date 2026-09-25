@@ -35,6 +35,7 @@ export function PreferenceForm({ tripId, token: urlToken }: Props) {
   const [ranking, setRanking] = useState<DestType[]>(["beach", "hills", "city", "adventure"]);
   const [dealbreakers, setDealbreakers] = useState<Dealbreaker[]>([]);
   const [wontGo, setWontGo] = useState<string[]>([]);
+  const [dream, setDream] = useState("");
   const [note, setNote] = useState("");
 
   const [busy, setBusy] = useState(false);
@@ -58,7 +59,7 @@ export function PreferenceForm({ tripId, token: urlToken }: Props) {
           const m = await api<MeView>(`/api/trips/${tripId}/me?token=${encodeURIComponent(urlToken)}`);
           if (cancelled) return;
           setMe(m);
-          saveToken(tripId, urlToken);
+          saveToken(tripId, urlToken, { name: m.trip.name, participantName: m.participant.name });
           setParticipantId(m.participant.id);
           if (m.response) {
             setHomeCity(m.response.homeCity);
@@ -67,6 +68,7 @@ export function PreferenceForm({ tripId, token: urlToken }: Props) {
             setRanking(m.response.typeRanking);
             setDealbreakers(m.response.dealbreakers);
             setWontGo(m.response.wontGo);
+            setDream(m.response.dreamDestination ?? "");
             setNote(m.response.note ?? "");
           }
         } else {
@@ -109,9 +111,9 @@ export function PreferenceForm({ tripId, token: urlToken }: Props) {
     setError(null);
     try {
       const res = await api<{ token: string; name: string; created: boolean }>(`/api/trips/${tripId}/responses`, {
-        body: { participantId, token: urlToken ?? undefined, homeCity, availableDates: dates, maxBudget: budget, typeRanking: ranking, dealbreakers, wontGo, note },
+        body: { participantId, token: urlToken ?? undefined, homeCity, availableDates: dates, maxBudget: budget, typeRanking: ranking, dealbreakers, wontGo, dreamDestination: dream || null, note },
       });
-      saveToken(tripId, res.token);
+      saveToken(tripId, res.token, { name: trip?.name, participantName: res.name });
       setDone(res);
       window.scrollTo({ top: 0 });
     } catch (err) {
@@ -283,6 +285,11 @@ export function PreferenceForm({ tripId, token: urlToken }: Props) {
             <RankList value={ranking} onChange={setRanking} />
           </Card>
 
+          {/* Dream destination (optional) */}
+          <Card>
+            <DreamPicker destinations={destinations} value={dream} onChange={setDream} exclude={wontGo} />
+          </Card>
+
           {/* Dealbreakers */}
           <Card className="space-y-4">
             <fieldset>
@@ -302,7 +309,14 @@ export function PreferenceForm({ tripId, token: urlToken }: Props) {
                 ))}
               </div>
             </fieldset>
-            <WontGoPicker destinations={destinations} value={wontGo} onChange={setWontGo} />
+            <WontGoPicker
+              destinations={destinations}
+              value={wontGo}
+              onChange={(v) => {
+                setWontGo(v);
+                if (dream && v.includes(dream)) setDream("");
+              }}
+            />
           </Card>
 
           {/* Note */}
@@ -321,6 +335,72 @@ export function PreferenceForm({ tripId, token: urlToken }: Props) {
         )}
       </form>
     </div>
+  );
+}
+
+/** Optional country → city pick that gives that destination a bonus in your score. */
+function DreamPicker({
+  destinations,
+  value,
+  onChange,
+  exclude,
+}: {
+  destinations: DestinationLite[];
+  value: string;
+  onChange: (v: string) => void;
+  exclude: string[];
+}) {
+  const countries = [...new Set(destinations.map((d) => d.country))].sort();
+  const current = destinations.find((d) => d.id === value);
+  const [country, setCountry] = useState(current?.country ?? "");
+  const shownCountry = current?.country ?? country;
+  const cities = destinations.filter((d) => d.country === shownCountry && !exclude.includes(d.id));
+
+  return (
+    <fieldset>
+      <legend className="font-medium text-slate-900">
+        Dream destination <span className="font-normal text-slate-500">(optional)</span>
+      </legend>
+      <p className="text-sm text-slate-500">Got one place you&apos;d love to go? It gets a +10 boost in your score. It still has to pass everyone&apos;s dealbreakers.</p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <label className="text-sm text-slate-700">
+          Country
+          <select
+            className={`${input} mt-1`}
+            value={shownCountry}
+            onChange={(e) => {
+              setCountry(e.target.value);
+              onChange("");
+            }}
+          >
+            <option value="">No preference</option>
+            {countries.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </label>
+        <label className="text-sm text-slate-700">
+          City / place
+          <select className={`${input} mt-1`} value={value} disabled={!shownCountry} onChange={(e) => onChange(e.target.value)}>
+            <option value="">{shownCountry ? "Choose a place…" : "Pick a country first"}</option>
+            {cities.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name} · {d.state}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      {current && (
+        <p className="mt-2 text-sm text-amber-800">
+          <span aria-hidden>⭐ </span>
+          {current.name} gets +10 in your score.{" "}
+          <button type="button" className="underline" onClick={() => { onChange(""); setCountry(""); }}>
+            Clear
+          </button>
+        </p>
+      )}
+    </fieldset>
   );
 }
 

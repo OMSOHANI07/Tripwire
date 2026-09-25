@@ -6,8 +6,8 @@ import { CompletionTracker } from "./CompletionTracker";
 import { LinkBox } from "./CopyButton";
 import { DecisionBanner, useResults } from "./Results";
 import { btn, Card, Loading, Notice } from "./ui";
-import { ApiError, api, links } from "@/lib/client";
-import { formatRange, listNames } from "@/lib/format";
+import { ApiError, api, links, rememberTrip } from "@/lib/client";
+import { formatRange, listNames, suggestionLine } from "@/lib/format";
 
 export function AdminView({ tripId, orgKey }: { tripId: string; orgKey: string | null }) {
   const [authed, setAuthed] = useState<boolean | null>(orgKey ? null : false);
@@ -19,7 +19,10 @@ export function AdminView({ tripId, orgKey }: { tripId: string; orgKey: string |
   useEffect(() => {
     if (!orgKey) return;
     api(`/api/trips/${tripId}/admin?key=${encodeURIComponent(orgKey)}`)
-      .then(() => setAuthed(true))
+      .then(() => {
+        setAuthed(true);
+        rememberTrip({ tripId, organizerKey: orgKey });
+      })
       .catch(() => setAuthed(false));
   }, [tripId, orgKey]);
 
@@ -82,7 +85,14 @@ export function AdminView({ tripId, orgKey }: { tripId: string; orgKey: string |
         <Card className="space-y-3">
           <h2 className="font-semibold text-slate-900">Final decision</h2>
           {options.length === 0 ? (
-            <Notice tone="warn">No destination passes everyone&apos;s filters, so there&apos;s nothing to vote on yet. See the results page for what&apos;s blocking.</Notice>
+            <Notice tone="warn">
+              No destination passes everyone&apos;s filters, so there&apos;s nothing to vote on yet. See the results page for what&apos;s blocking.
+              {data.dateSuggestion && (
+                <p className="mt-1 font-medium">
+                  <span aria-hidden>💡 </span>Dates: {suggestionLine(data.dateSuggestion, data.basedOn ?? trip.total)}
+                </p>
+              )}
+            </Notice>
           ) : (
             <>
               <ul className="space-y-1 text-sm">

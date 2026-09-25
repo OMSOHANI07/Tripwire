@@ -14,6 +14,8 @@ import {
   travelPoints,
   typePoints,
   whoBlocksDates,
+  suggestDates,
+  DREAM_BONUS,
 } from "@/lib/scoring";
 import type { Destination, ParticipantPrefs, TripParams } from "@/lib/types";
 import { CATALOG } from "@/lib/catalog-data";
@@ -26,6 +28,7 @@ function dest(over: Partial<Destination> = {}): Destination {
   return {
     id: "beachy",
     name: "Beachy",
+    country: "India",
     state: "Test",
     types: ["beach"],
     costMin: 8000,
@@ -301,5 +304,59 @@ describe("formatting", async () => {
   it("formats date ranges", () => {
     expect(formatRange("2026-11-18", "2026-11-20")).toBe("18–20 Nov");
     expect(formatRange("2026-11-30", "2026-12-02")).toBe("30 Nov – 2 Dec");
+  });
+});
+
+describe("dream destination", () => {
+  const window = { start: "2026-11-10", end: "2026-11-12" };
+  it("adds a flat bonus to that person's fit only", () => {
+    const plain = personFit(dest({ types: ["city"] }), person(), window, trip);
+    const dreamy = personFit(dest({ types: ["city"] }), person({ dreamDestination: "beachy" }), window, trip);
+    expect(dreamy.fit).toBe(plain.fit + DREAM_BONUS);
+    expect(dreamy.dream).toBe(true);
+    expect(plain.dream).toBe(false);
+  });
+  it("is capped at 100", () => {
+    expect(personFit(dest(), person({ dreamDestination: "beachy", homeCity: "Bengaluru" }), window, trip).fit).toBeLessThanOrEqual(100);
+  });
+  it("never overrides a hard filter", () => {
+    const p = person({ dreamDestination: "beachy", maxBudget: 5000 });
+    const res = computeResults([dest()], [p], trip);
+    expect(res.status).toBe("none_pass");
+  });
+  it("lists who dreams of each option", () => {
+    const res = computeResults([dest()], [person({ name: "Riya", participantId: "r", dreamDestination: "beachy" }), person({ name: "Sid", participantId: "s" })], trip);
+    expect(res.options[0].dreamOf).toEqual(["Riya"]);
+  });
+});
+
+describe("suggestDates", () => {
+  it("suggests the window most people can make, and a shorter one everyone can", () => {
+    const a = person({ name: "A", participantId: "a", availableDates: enumerateDates("2026-11-10", "2026-11-14") });
+    const b = person({ name: "B", participantId: "b", availableDates: enumerateDates("2026-11-10", "2026-11-14") });
+    const c = person({ name: "C", participantId: "c", availableDates: enumerateDates("2026-11-13", "2026-11-20") });
+    const s = suggestDates([a, b, c], trip);
+    expect(s.best).toEqual({ start: "2026-11-10", end: "2026-11-12", available: ["A", "B"], missing: ["C"] });
+    expect(s.shorter).toEqual({ start: "2026-11-13", end: "2026-11-14", days: 2 });
+  });
+  it("is attached to results only when no window works", () => {
+    const a = person({ name: "A", participantId: "a", availableDates: ["2026-11-10"] });
+    const b = person({ name: "B", participantId: "b", availableDates: ["2026-11-15"] });
+    const res = computeResults([dest()], [a, b], trip);
+    expect(res.dateSuggestion?.shorter).toBeNull();
+    expect(res.dateSuggestion?.best).toBeNull();
+    expect(computeResults([dest()], [person()], trip).dateSuggestion).toBeNull();
+  });
+});
+
+describe("suggestionLine", async () => {
+  const { suggestionLine } = await import("@/lib/format");
+  it("reads as one line", () => {
+    expect(
+      suggestionLine(
+        { best: { start: "2026-11-10", end: "2026-11-12", available: ["A", "B"], missing: ["C"] }, shorter: { start: "2026-11-13", end: "2026-11-14", days: 2 } },
+        3,
+      ),
+    ).toBe("10–12 Nov works for 2 of 3 (everyone except C), or everyone can make a 2-day trip on 13–14 Nov.");
   });
 });

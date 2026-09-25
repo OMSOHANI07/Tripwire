@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Container, DestPhoto, Eyebrow, PinIcon, Wave } from "@/components/brand";
 import { DemoButton } from "@/components/DemoButton";
+import { MyTrips } from "@/components/MyTrips";
 import { btn } from "@/components/ui";
 import { CATALOG } from "@/lib/catalog-data";
 import { inr } from "@/lib/format";
@@ -48,6 +49,11 @@ export default function Home() {
         </Container>
         <Wave />
       </section>
+
+      {/* Saved trips (only shows if this device has any) ------------------ */}
+      <Container className="pt-12 empty:hidden">
+        <MyTrips limit={3} />
+      </Container>
 
       {/* How it works (template's "popular destination" block) ----------- */}
       <section id="how" className="scroll-mt-20 py-16 sm:py-24">

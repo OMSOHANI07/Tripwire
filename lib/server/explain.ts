@@ -9,7 +9,7 @@ import type { TripRow } from "./trips";
 
 export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
 /** Bump when the prompt changes so cached explanations are regenerated. */
-const PROMPT_VERSION = 2;
+const PROMPT_VERSION = 3;
 
 interface CachedExplanations {
   source: "ai" | "template";
@@ -59,6 +59,7 @@ function promptFor(options: OptionView[], people: string[]): string {
     groupScore: o.groupScore,
     perPersonFit: o.fits.map((f) => ({ name: f.name, fit: f.fit, components: f.parts })),
     tradeOffs: o.tradeOffs,
+    dreamDestinationOf: o.dreamOf,
   }));
   return [
     `A group of friends (${people.join(", ")}) is choosing a 3–4 day trip in India.`,
@@ -70,6 +71,7 @@ function promptFor(options: OptionView[], people: string[]): string {
     "  score or the cost in rupees (write ₹9,000, not INR). Never quote the component scores themselves.",
     '- "compromise": one sentence naming who compromises most and why, in plain words (e.g. "not really their kind of',
     '  trip", "a long journey from home"). Use they/them for everyone.',
+    "If dreamDestinationOf lists anyone, mention warmly that it's their dream destination.",
     "Do not change, re-rank or invent scores, prices or facts. Plain text, no markdown.",
     "",
     JSON.stringify(payload, null, 2),

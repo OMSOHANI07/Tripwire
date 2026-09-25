@@ -1,5 +1,5 @@
 // Shapes returned by the API routes and consumed by the pages.
-import type { Block, DateNote, DateWindow, FitParts } from "./scoring";
+import type { Block, DateNote, DateSuggestion, DateWindow, FitParts } from "./scoring";
 import type { Dealbreaker, DestType } from "./types";
 
 export interface ParticipantSummary {
@@ -48,7 +48,9 @@ export interface OptionView {
   costMax: number;
   groupScore: number;
   avgFit: number;
-  fits: { name: string; fit: number; parts: FitParts }[];
+  fits: { name: string; fit: number; parts: FitParts; dream: boolean }[];
+  /** People who picked this as their dream destination. */
+  dreamOf: string[];
   tradeOffs: string[];
   blocks: Block[];
 }
@@ -68,6 +70,7 @@ export interface ResultsView {
   closest?: OptionView[];
   filteredOut?: { name: string; reasons: string[] }[];
   dateNotes?: DateNote[];
+  dateSuggestion?: DateSuggestion | null;
   commonWindowCount?: number;
   explanations?: Record<string, Explanation>;
   explanationSource?: "ai" | "template";
@@ -90,6 +93,7 @@ export interface ResponseInput {
   typeRanking: DestType[];
   dealbreakers: Dealbreaker[];
   wontGo: string[];
+  dreamDestination?: string | null;
   note?: string;
 }
 
@@ -103,6 +107,7 @@ export interface MeView {
 export interface DestinationLite {
   id: string;
   name: string;
+  country: string;
   state: string;
   types: DestType[];
 }

@@ -132,6 +132,7 @@ const ROWS: Row[] = [
 export const CATALOG: Destination[] = ROWS.map((r) => ({
   id: r.id,
   name: r.name,
+  country: "India",
   state: r.state,
   types: r.types,
   costMin: r.cost[0],

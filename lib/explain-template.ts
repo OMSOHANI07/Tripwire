@@ -19,7 +19,8 @@ export function templateExplanation(o: OptionView): Explanation {
     `${o.name} is a ${types} pick at about ${inr(o.cost)} per person, within everyone's budget, ` +
     `with an average fit of ${o.avgFit}/100.` +
     dates +
-    (top.length ? ` It suits ${top.join(" and ")} best.` : "");
+    (top.length ? ` It suits ${top.join(" and ")} best.` : "") +
+    (o.dreamOf.length ? ` It's also ${o.dreamOf.join(" and ")}'s dream destination.` : "");
 
   const low = sorted[sorted.length - 1];
   let compromise = "Nobody gives up much here.";

@@ -54,14 +54,14 @@ export function DestPhoto({
 
 export function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-2.5" aria-label="Group Trip Decider home">
+    <Link href="/" className="flex min-w-0 items-center gap-2 sm:gap-2.5" aria-label="Group Trip Decider home">
       <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center sm:h-10 sm:w-10 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-700 text-white shadow-md shadow-brand-600/30">
         <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
           <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" />
         </svg>
       </span>
       <span className="leading-tight">
-        <span className="block whitespace-nowrap font-display text-base font-bold text-ink sm:text-lg">Group Trip Decider</span>
+        <span className="block whitespace-nowrap font-display text-[15px] font-bold text-ink sm:text-lg">Group Trip Decider</span>
         <span className="hidden text-[10px] font-semibold uppercase tracking-[0.25em] text-brand-600 sm:block">Plan · Vote · Go</span>
       </span>
     </Link>

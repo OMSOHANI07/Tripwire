@@ -28,6 +28,7 @@ The look follows a travel-site template: a full-bleed photo hero with a wavy edg
 | --- | --- |
 | **Organizer setup** | `/new` → `components/NewTripForm.tsx` → `POST /api/trips`. Trip name, date window, trip length, deadline (date + time, entered in IST), and 2–10 participant names. On create it shows the share link, the private organizer link, and a copy-ready WhatsApp message. |
 | **Preference form (via the one link)** | `/t/[tripId]` → `components/PreferenceForm.tsx`. Pick your name (already-submitted names are marked), home city, available dates (`DateCalendar`, limited to the trip window, with Select all / +Fri–Sun / Clear), max budget (slider + ₹ input), rank beach/hills/city/adventure (`RankList`: drag or ↑/↓ buttons), dealbreakers (flights, travel over 8h, treks), a searchable "places I won't go" list from the catalog, and an optional note. After submitting you get your personal edit link, `/t/[tripId]/me?token=…`. |
+| **Dream destination (optional)** | On the form, pick a country, then a city or place from the catalog (all India for now; the country list comes from the data). It adds +10 to that person's fit for that destination. It can't also be on their "won't go" list. Options show a "⭐ Dream pick for …" chip, and the fit grid marks it with ★. |
 | **Why a form, not a poll** | Explained on the landing page. Structured fields are what make the scoring possible. |
 
 ### 2. Store & track
@@ -70,7 +71,7 @@ All of it is in `lib/scoring.ts`.
 - it involves treks and they said no treks;
 - it's on their "won't go" list.
 
-**3. Per-person fit (0–100)** = 30% budget + 35% type + 20% travel + 15% season, where:
+**3. Per-person fit (0–100)** = 30% budget + 35% type + 20% travel + 15% season, **+10 if it's that person's dream destination** (capped at 100). A dream pick never overrides a hard filter. The components are:
 
 | Component | Points |
 | --- | --- |
@@ -85,7 +86,13 @@ All of it is in `lib/scoring.ts`.
 
 **6. Nobody passes?** You get the 3 closest options: blocked by the fewest people, then the fewest rules, then the best score. Each comes with the exact person and rule that blocks it (e.g. "Aisha: Est. ₹12,500 is over Aisha's max of ₹12,000"). If the problem is dates, the people whose calendars break the overlap are named (a person "blocks" if removing just them would open a window).
 
+**7. No shared dates?** `suggestDates` adds one suggestion line to the results, for example "4–7 Nov works for 2 of 3 (everyone except Chitra), or everyone can make a 2-day trip on 8–9 Nov". It names the full-length window the most people can make (only if at least half the group and 2+ people can), plus the longest shorter stretch that works for everyone.
+
 **Vote tally.** Most votes wins, and a tie goes to the higher group score. Votes for destinations that dropped out of the top 3 (because someone edited before the deadline) are ignored.
+
+## My trips (saved sessions)
+
+`/trips`, plus a "Your trips" section on the home page, lists every trip this device created, joined or opened. Each card shows your organizer and/or personal link, live status (submitted count and deadline, results ready, or the decision) and buttons for results, the organizer view and editing your answers. It's stored in the browser's localStorage (`gtd:trips`, in `lib/client.ts`). There are no accounts, so the list is per device and per browser. Personal links saved before this feature existed are imported automatically. "Remove" only takes a trip off this device's list; it doesn't delete the trip.
 
 ## No logins: how tokens work
 
@@ -155,6 +162,8 @@ Import the repo on vercel.com (framework preset: Next.js) and add the four varia
 - **Name claiming:** anyone with the share link can claim an unsubmitted name (that's what "one link, no logins" implies). Once claimed, only the personal token can edit it. A lost personal link can't be recovered in-app (the token is only stored hashed).
 - **Deadlines** are entered and shown in IST (`Asia/Kolkata`). Dates are stored as plain `date` values.
 - **Demo trip dates** are relative to today (window starts on the 12th of the month after next), so the demo never goes stale.
+- **Dream bonus = +10 fit points**: enough to lift a dream pick among close options, not enough to beat a clearly better fit for the group.
+- **My trips is device-only:** without logins there's nowhere to sync it, and it keeps working without a server round-trip.
 - **Scoring curve:** I first tried a gentler travel curve (0 at 16h), but it put almost every cell in the green. The steeper 13h curve makes the grid actually discriminate.
 
 ## Out of scope (the cut)

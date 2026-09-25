@@ -7,6 +7,7 @@ export const GET = handle(async () => {
   const list: DestinationLite[] = (await getDestinations()).map((d) => ({
     id: d.id,
     name: d.name,
+    country: d.country,
     state: d.state,
     types: d.types,
   }));

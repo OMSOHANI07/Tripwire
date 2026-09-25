@@ -72,6 +72,7 @@ export const POST = handle(async (req: Request, { params }: Ctx) => {
         type_ranking: input.typeRanking,
         dealbreakers: input.dealbreakers,
         wont_go: input.wontGo,
+        dream_destination: input.dreamDestination ?? null,
         note: input.note ?? null,
       },
       { onConflict: "participant_id" },

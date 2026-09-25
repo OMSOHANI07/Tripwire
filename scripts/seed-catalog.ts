@@ -14,6 +14,7 @@ const supabase = createClient(
 const rows = CATALOG.map((d) => ({
   id: d.id,
   name: d.name,
+  country: d.country,
   state: d.state,
   types: d.types,
   cost_min: d.costMin,

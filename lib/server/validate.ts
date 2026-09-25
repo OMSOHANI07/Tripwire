@@ -104,6 +104,15 @@ export function validateResponse(
   }
   const note = typeof body.note === "string" ? body.note.trim().slice(0, 500) : "";
 
+  let dreamDestination: string | null = null;
+  if (typeof body.dreamDestination === "string" && body.dreamDestination) {
+    if (!ctx.destinationIds.has(body.dreamDestination)) throw bad("Unknown dream destination");
+    if ((wontGo as string[]).includes(body.dreamDestination)) {
+      throw bad("Your dream destination is also on your 'won't go' list");
+    }
+    dreamDestination = body.dreamDestination;
+  }
+
   return {
     homeCity,
     availableDates: dates,
@@ -111,6 +120,7 @@ export function validateResponse(
     typeRanking: ranking as DestType[],
     dealbreakers: [...new Set(dealbreakers)] as Dealbreaker[],
     wontGo: wontGo as string[],
+    dreamDestination,
     note: note || undefined,
   };
 }

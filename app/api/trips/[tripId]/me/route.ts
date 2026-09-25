@@ -22,6 +22,7 @@ export const GET = handle(async (req: Request, { params }: Ctx) => {
           typeRanking: r.type_ranking,
           dealbreakers: r.dealbreakers,
           wontGo: r.wont_go,
+          dreamDestination: r.dream_destination,
           note: r.note ?? undefined,
         }
       : null,

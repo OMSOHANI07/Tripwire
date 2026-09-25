@@ -13,6 +13,7 @@
  *   4. personFit          – 0–100 fit per person (budget/type/travel/season)
  *   5. groupScore         – average fit minus 15 per person below 50
  *   6. computeResults     – top 3, or the closest options + who blocks them
+ *   7. suggestDates       – if no dates line up, the nearest workable timeline
  */
 
 import type {
@@ -37,6 +38,8 @@ export const LONG_TRAVEL_HOURS = 8;
 export const LOW_FIT_FLOOR = 50;
 export const LOW_FIT_PENALTY = 15;
 export const TOP_N = 3;
+/** Fit points added for the person whose dream destination this is. */
+export const DREAM_BONUS = 10;
 
 // ---------------------------------------------------------------------------
 // Result types
@@ -76,6 +79,8 @@ export interface PersonFit {
   name: string;
   fit: number;
   parts: FitParts;
+  /** True when this is the person's dream destination (fit includes DREAM_BONUS). */
+  dream: boolean;
 }
 
 export interface ScoredOption {
@@ -87,6 +92,8 @@ export interface ScoredOption {
   groupScore: number;
   /** Names of people whose fit is below LOW_FIT_FLOOR. */
   lowFit: string[];
+  /** Names of people who picked this as their dream destination. */
+  dreamOf: string[];
   tradeOffs: string[];
   blocks: Block[];
 }
@@ -111,6 +118,15 @@ export interface ResultsComputation {
   filteredOut: ScoredOption[];
   dateNotes: DateNote[];
   passedCount: number;
+  /** Only when no window works for everyone: the nearest workable timeline. */
+  dateSuggestion: DateSuggestion | null;
+}
+
+export interface DateSuggestion {
+  /** The trip-length window that the most people can make. */
+  best: { start: string; end: string; available: string[]; missing: string[] } | null;
+  /** The longest shorter stretch that everyone can make. */
+  shorter: { start: string; end: string; days: number } | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -346,7 +362,8 @@ export function travelPoints(hours: number): number {
 
 /**
  * Fit (0–100) of one destination for one person, weighted:
- * budget 30%, type rank 35%, travel time 20%, good month 15%.
+ * budget 30%, type rank 35%, travel time 20%, good month 15%,
+ * plus DREAM_BONUS if it's their dream destination (capped at 100).
  * If there is no common window, season is judged over the whole trip window.
  */
 export function personFit(
@@ -363,13 +380,16 @@ export function personFit(
       ? seasonScore(dest, window.start, window.end)
       : seasonScore(dest, trip.windowStart, trip.windowEnd),
   };
-  const fit = Math.round(
+  const dream = Boolean(pref.dreamDestination) && pref.dreamDestination === dest.id;
+  const base =
     WEIGHTS.budget * parts.budget +
-      WEIGHTS.type * parts.type +
-      WEIGHTS.travel * parts.travel +
-      WEIGHTS.season * parts.season,
-  );
-  return { participantId: pref.participantId, name: pref.name, fit, parts };
+    WEIGHTS.type * parts.type +
+    WEIGHTS.travel * parts.travel +
+    WEIGHTS.season * parts.season;
+  // A dream destination gets a flat bonus, capped at 100. It never overrides
+  // the hard filters: a dream pick that breaks someone's rules is still dropped.
+  const fit = Math.min(100, Math.round(base + (dream ? DREAM_BONUS : 0)));
+  return { participantId: pref.participantId, name: pref.name, fit, parts, dream };
 }
 
 // ---------------------------------------------------------------------------
@@ -481,6 +501,7 @@ function scoreDestination(
     avgFit: Math.round(values.reduce((s, f) => s + f, 0) / Math.max(1, values.length)),
     groupScore: groupScore(values),
     lowFit: fits.filter((f) => f.fit < LOW_FIT_FLOOR).map((f) => f.name),
+    dreamOf: fits.filter((f) => f.dream).map((f) => f.name),
     tradeOffs: tradeOffsFor(dest, prefs, fits, window),
     blocks: hardFilterBlocks(dest, prefs, dateBlocks),
   };
@@ -521,6 +542,7 @@ export function computeResults(
     filteredOut: [],
     dateNotes: [],
     passedCount: 0,
+    dateSuggestion: null,
   };
   if (prefs.length === 0) return empty;
 
@@ -533,6 +555,7 @@ export function computeResults(
   const passed = scored.filter((o) => o.blocks.length === 0).sort(byScore);
   const failed = scored.filter((o) => o.blocks.length > 0);
   const dateNotes = computeDateNotes(prefs, trip);
+  const dateSuggestion = commonWindows.length ? null : suggestDates(prefs, trip);
 
   if (passed.length > 0) {
     return {
@@ -543,6 +566,7 @@ export function computeResults(
       filteredOut: failed.sort(byScore).slice(0, 5),
       dateNotes,
       passedCount: passed.length,
+      dateSuggestion,
     };
   }
 
@@ -563,7 +587,40 @@ export function computeResults(
     filteredOut: [],
     dateNotes,
     passedCount: 0,
+    dateSuggestion,
   };
+}
+
+// ---------------------------------------------------------------------------
+// 7. Date suggestion when nothing lines up
+// ---------------------------------------------------------------------------
+
+/**
+ * When no trip-length window works for everyone, suggest the nearest workable
+ * timeline: (a) the trip-length window the most people can make (earliest on
+ * ties), only if at least half the group (and 2+ people) can make it, and
+ * (b) the longest shorter stretch that everyone can make.
+ */
+export function suggestDates(prefs: ParticipantPrefs[], trip: TripParams): DateSuggestion {
+  const sets = prefs.map((p) => ({ name: p.name, dates: new Set(p.availableDates) }));
+  let best: DateSuggestion["best"] = null;
+  const minPeople = Math.max(2, Math.ceil(prefs.length / 2));
+  const lastStart = addDays(trip.windowEnd, -(trip.tripLength - 1));
+  for (let start = trip.windowStart; start <= lastStart; start = addDays(start, 1)) {
+    const days = enumerateDates(start, addDays(start, trip.tripLength - 1));
+    const available = sets.filter((s) => days.every((d) => s.dates.has(d))).map((s) => s.name);
+    if (available.length >= minPeople && (!best || available.length > best.available.length)) {
+      const missing = sets.filter((s) => !available.includes(s.name)).map((s) => s.name);
+      best = { start, end: days[days.length - 1], available, missing };
+    }
+  }
+
+  let shorter: DateSuggestion["shorter"] = null;
+  for (let len = trip.tripLength - 1; len >= 1 && !shorter; len--) {
+    const w = findCommonWindows(prefs, { ...trip, tripLength: len })[0];
+    if (w) shorter = { start: w.start, end: w.end, days: len };
+  }
+  return { best, shorter };
 }
 
 // ---------------------------------------------------------------------------

@@ -13,6 +13,7 @@ interface DemoPerson {
   typeRanking: DestType[];
   dealbreakers: Dealbreaker[];
   wontGo: string[];
+  dream?: string;
   note: string;
   /** Available day ranges as [fromOffset, toOffset] inside the 18-day window. */
   free: [number, number][];
@@ -20,11 +21,11 @@ interface DemoPerson {
 
 export const DEMO_PEOPLE: DemoPerson[] = [
   { name: "Riya", homeCity: "Bengaluru", maxBudget: 15000, typeRanking: ["beach", "hills", "city", "adventure"],
-    dealbreakers: [], wontGo: [], note: "Organizing! Anywhere with good food works for me.", free: [[0, 3], [6, 17]] },
+    dealbreakers: [], wontGo: [], dream: "pondicherry", note: "Organizing! Anywhere with good food works for me.", free: [[0, 3], [6, 17]] },
   { name: "Siddharth", homeCity: "Mumbai", maxBudget: 14000, typeRanking: ["hills", "beach", "adventure", "city"],
-    dealbreakers: ["long_travel"], wontGo: [], note: "No more 14-hour bus rides please.", free: [[2, 12], [15, 17]] },
+    dealbreakers: ["long_travel"], wontGo: [], dream: "coorg", note: "No more 14-hour bus rides please.", free: [[2, 12], [15, 17]] },
   { name: "Karan", homeCity: "Delhi", maxBudget: 18000, typeRanking: ["adventure", "hills", "city", "beach"],
-    dealbreakers: [], wontGo: ["goa"], note: "Been to Goa three times. Something new?", free: [[6, 17]] },
+    dealbreakers: [], wontGo: ["goa"], dream: "manali", note: "Been to Goa three times. Something new?", free: [[6, 17]] },
   { name: "Aisha", homeCity: "Hyderabad", maxBudget: 12000, typeRanking: ["beach", "city", "hills", "adventure"],
     dealbreakers: ["treks"], wontGo: [], note: "", free: [[0, 11], [15, 16]] },
   { name: "Preethi", homeCity: "Chennai", maxBudget: 13000, typeRanking: ["city", "beach", "hills", "adventure"],
@@ -84,6 +85,7 @@ export async function createDemoTrip(client: SupabaseClient, now = new Date()): 
       type_ranking: p.typeRanking,
       dealbreakers: p.dealbreakers,
       wont_go: p.wontGo,
+      dream_destination: p.dream ?? null,
       note: p.note || null,
     })),
   );

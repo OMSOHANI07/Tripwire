@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { LinkBox } from "./CopyButton";
 import { btn, Card, Notice } from "./ui";
-import { api, links, saveToken } from "@/lib/client";
+import { api, links, rememberTrip, saveToken } from "@/lib/client";
 import type { DemoTrip } from "@/lib/demo";
 
 export function DemoButton({ onDark = false }: { onDark?: boolean }) {
@@ -18,7 +18,8 @@ export function DemoButton({ onDark = false }: { onDark?: boolean }) {
     try {
       const d = await api<DemoTrip>("/api/demo", { method: "POST", body: {} });
       // Act as Riya on this device so voting works straight away.
-      saveToken(d.tripId, d.people[0].token);
+      saveToken(d.tripId, d.people[0].token, { name: "College gang reunion (demo)", participantName: d.people[0].name });
+      rememberTrip({ tripId: d.tripId, organizerKey: d.organizerKey });
       setDemo(d);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't create the demo trip");

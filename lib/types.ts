@@ -37,6 +37,7 @@ export interface TravelInfo {
 export interface Destination {
   id: string;
   name: string;
+  country: string;
   state: string;
   types: DestType[];
   /** Estimated cost per person for a 3–4 day trip, excluding travel (₹). */
@@ -61,6 +62,8 @@ export interface ParticipantPrefs {
   dealbreakers: Dealbreaker[];
   /** Destination ids this person refuses to visit. */
   wontGo: string[];
+  /** Optional dream destination id: gets a DREAM_BONUS in this person's fit. */
+  dreamDestination?: string | null;
 }
 
 export interface TripParams {

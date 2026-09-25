@@ -62,3 +62,25 @@ export const TYPE_EMOJI: Record<string, string> = {
   city: "🏙️",
   adventure: "🧗",
 };
+
+/**
+ * One-line suggestion when no dates line up for everyone, e.g.
+ * "10–12 Nov works for 4 of 5 (all but Karan), or everyone can do a 2-day trip on 13–14 Nov."
+ */
+export function suggestionLine(
+  s: { best: { start: string; end: string; available: string[]; missing: string[] } | null; shorter: { start: string; end: string; days: number } | null },
+  total: number,
+): string {
+  const parts: string[] = [];
+  if (s.best) {
+    parts.push(
+      `${formatRange(s.best.start, s.best.end)} works for ${s.best.available.length} of ${total} (everyone except ${listNames(s.best.missing)})`,
+    );
+  }
+  if (s.shorter) {
+    parts.push(`everyone can make a ${s.shorter.days}-day trip on ${formatRange(s.shorter.start, s.shorter.end)}`);
+  }
+  if (parts.length === 0) return "No dates overlap yet. Ask everyone to add a few more days they can travel.";
+  const line = parts.join(", or ");
+  return line.charAt(0).toUpperCase() + line.slice(1) + ".";
+}

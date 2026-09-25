@@ -6,8 +6,8 @@ import { DestPhoto, PinIcon } from "./brand";
 import { CopyButton } from "./CopyButton";
 import { btn, Card, Loading, Notice } from "./ui";
 import type { Explanation, MeView, OptionView, ResultsView, TripPublic } from "@/lib/api-types";
-import { api, links, loadToken } from "@/lib/client";
-import { formatDeadline, formatRange, inr, listNames, plural, TYPE_EMOJI, TYPE_LABELS } from "@/lib/format";
+import { api, links, loadToken, rememberTrip } from "@/lib/client";
+import { formatDeadline, formatRange, inr, listNames, plural, suggestionLine, TYPE_EMOJI, TYPE_LABELS } from "@/lib/format";
 import type { DateNote } from "@/lib/scoring";
 
 // ---------------------------------------------------------------------------
@@ -140,6 +140,11 @@ function OptionCard({
       <div className="space-y-4 px-5 pb-5 sm:px-6 sm:pb-6">
 
       <div className="flex flex-wrap gap-1.5">
+        {o.dreamOf.length > 0 && (
+          <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-900">
+            <span aria-hidden>⭐ </span>Dream pick for {listNames(o.dreamOf)}
+          </span>
+        )}
         {o.types.map((t) => (
           <span key={t} className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
             <span aria-hidden className="mr-1">{TYPE_EMOJI[t]}</span>
@@ -223,6 +228,8 @@ export function StandsGrid({ options, people }: { options: OptionView[]; people:
                     <td key={o.destinationId} className={`rounded-lg py-2 text-center font-bold tabular-nums ${scoreClass(n)}`}
                       title={f ? `Budget ${f.parts.budget} · Type ${f.parts.type} · Travel ${f.parts.travel} · Season ${f.parts.season}` : undefined}>
                       {n}
+                      {f?.dream && <span aria-hidden className="ml-0.5 text-xs">★</span>}
+                      {f?.dream && <span className="sr-only"> (dream destination)</span>}
                       {n < 65 && <span className="sr-only"> (low)</span>}
                     </td>
                   );
@@ -236,6 +243,7 @@ export function StandsGrid({ options, people }: { options: OptionView[]; people:
         <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded bg-emerald-700" /> 80+ great</span>
         <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded bg-amber-300" /> 65–79 okay</span>
         <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded bg-red-700" /> below 65 compromise</span>
+        <span className="flex items-center gap-1.5">★ dream destination (+10)</span>
       </div>
     </Card>
   );
@@ -301,7 +309,14 @@ export function ResultsPage({ tripId, token: urlToken }: { tripId: string; token
   const [voteError, setVoteError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (token) api<MeView>(`/api/trips/${tripId}/me?token=${encodeURIComponent(token)}`).then(setMe, () => setMe(null));
+    if (token)
+      api<MeView>(`/api/trips/${tripId}/me?token=${encodeURIComponent(token)}`).then(
+        (m) => {
+          setMe(m);
+          rememberTrip({ tripId, token, name: m.trip.name, participantName: m.participant.name });
+        },
+        () => setMe(null),
+      );
   }, [tripId, token]);
 
   async function vote(destinationId: string) {
@@ -420,11 +435,12 @@ export function ResultsPage({ tripId, token: urlToken }: { tripId: string; token
           </Notice>
           {data.commonWindowCount === 0 && (
             <Notice tone="error" title={`No ${trip.tripLength}-day stretch works for everyone`}>
-              {(data.closest?.[0]?.blocks ?? [])
-                .filter((b) => b.rule === "dates")
-                .map((b) => b.detail)
-                .join(". ")}
-              . Check the date notes below to see who can&apos;t make what.
+              {data.dateSuggestion && (
+                <p className="font-medium">
+                  <span aria-hidden>💡 </span>Suggestion: {suggestionLine(data.dateSuggestion, data.basedOn ?? trip.total)}
+                </p>
+              )}
+              <p className="mt-1">The date notes below show who can&apos;t make what.</p>
             </Notice>
           )}
           <div className="space-y-4">

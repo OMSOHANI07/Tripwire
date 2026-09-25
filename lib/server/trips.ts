@@ -50,6 +50,7 @@ export interface ResponseRow {
   type_ranking: DestType[];
   dealbreakers: Dealbreaker[];
   wont_go: string[];
+  dream_destination: string | null;
   note: string | null;
   updated_at: string;
 }
@@ -62,6 +63,7 @@ export interface VoteRow {
 interface DestinationRow {
   id: string;
   name: string;
+  country: string;
   state: string;
   types: DestType[];
   cost_min: number;
@@ -98,6 +100,7 @@ export async function getDestinations(): Promise<Destination[]> {
   const mapped = (data as DestinationRow[]).map((r) => ({
     id: r.id,
     name: r.name,
+    country: r.country,
     state: r.state,
     types: r.types,
     costMin: r.cost_min,
@@ -235,6 +238,7 @@ export function prefsFrom(bundle: TripBundle): ParticipantPrefs[] {
       typeRanking: r.type_ranking,
       dealbreakers: r.dealbreakers,
       wontGo: r.wont_go,
+      dreamDestination: r.dream_destination,
     }));
 }
 
@@ -251,7 +255,8 @@ function toOptionView(o: ScoredOption): OptionView {
     costMax: o.destination.costMax,
     groupScore: o.groupScore,
     avgFit: o.avgFit,
-    fits: o.fits.map((f) => ({ name: f.name, fit: f.fit, parts: f.parts })),
+    fits: o.fits.map((f) => ({ name: f.name, fit: f.fit, parts: f.parts, dream: f.dream })),
+    dreamOf: o.dreamOf,
     tradeOffs: o.tradeOffs,
     blocks: o.blocks,
   };
@@ -294,6 +299,7 @@ export function computeView(bundle: TripBundle, now = new Date()): ResultsView {
       reasons: [...new Set(o.blocks.map((b) => b.detail))].slice(0, 3),
     })),
     dateNotes: res.dateNotes,
+    dateSuggestion: res.dateSuggestion,
     commonWindowCount: res.commonWindows.length,
     votes: {
       counts: tally.counts,
