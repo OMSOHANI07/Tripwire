@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Outfit, Plus_Jakarta_Sans } from "next/font/google";
+import { ArrowRight, Container, Logo } from "@/components/brand";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const outfit = Outfit({ variable: "--font-outfit", subsets: ["latin"], weight: ["500", "600", "700", "800"] });
+const jakarta = Plus_Jakarta_Sans({ variable: "--font-jakarta", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -11,28 +13,54 @@ export const metadata: Metadata = {
   description: "One link in, one decision out. Collect everyone's trip preferences and pick a destination together.",
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0f766e" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0f78e0" };
+
+const NAV = [
+  { href: "/", label: "Home" },
+  { href: "/#how", label: "How it works" },
+  { href: "/destinations", label: "Destinations" },
+];
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">
+    <html lang="en" className={`${outfit.variable} ${jakarta.variable} ${geistMono.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col font-sans">
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2">
           Skip to content
         </a>
-        <header className="border-b border-stone-200 bg-white/80 backdrop-blur">
-          <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
-            <Link href="/" className="flex items-center gap-2 font-semibold text-stone-900">
-              <span aria-hidden className="grid h-8 w-8 place-items-center rounded-lg bg-teal-700 text-white">✈</span>
-              Group Trip Decider
+        <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 backdrop-blur">
+          <Container className="flex items-center justify-between gap-4 py-3">
+            <Logo />
+            <nav aria-label="Main" className="hidden items-center gap-7 text-sm font-medium text-slate-600 md:flex">
+              {NAV.map((n) => (
+                <Link key={n.href} href={n.href} className="hover:text-brand-600">
+                  {n.label}
+                </Link>
+              ))}
+            </nav>
+            <Link
+              href="/new"
+              className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-brand-600/25 hover:bg-brand-700 sm:py-2.5"
+            >
+              <span className="sm:hidden">Plan a trip</span>
+              <span className="hidden sm:inline">Plan your trip</span> <ArrowRight />
             </Link>
-          </div>
+          </Container>
         </header>
-        <main id="main" className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:py-10">
+        <main id="main" className="flex-1">
           {children}
         </main>
-        <footer className="py-6 text-center text-xs text-stone-500">
-          Scores are computed by plain code; AI only writes the explanations.
+        <footer className="bg-ink text-slate-300">
+          <Container className="flex flex-col gap-4 py-8 text-sm sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              <span className="font-display font-semibold text-white">Group Trip Decider</span> · Scores are plain maths. AI only
+              writes the explanations.
+            </p>
+            <nav aria-label="Footer" className="flex gap-5">
+              <Link href="/destinations" className="hover:text-white">Destinations</Link>
+              <Link href="/credits" className="hover:text-white">Photo credits</Link>
+            </nav>
+          </Container>
         </footer>
       </body>
     </html>

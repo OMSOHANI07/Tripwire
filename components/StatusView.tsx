@@ -38,8 +38,8 @@ export function StatusView({ tripId }: { tripId: string }) {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-stone-900">{trip.name}</h1>
-        <p className="mt-1 text-stone-600">{plural(trip.tripLength, "day")} between {formatRange(trip.windowStart, trip.windowEnd)}</p>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">{trip.name}</h1>
+        <p className="mt-1 text-slate-600">{plural(trip.tripLength, "day")} between {formatRange(trip.windowStart, trip.windowEnd)}</p>
       </div>
       <CompletionTracker trip={trip} />
       <Card>

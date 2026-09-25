@@ -163,8 +163,8 @@ export function PreferenceForm({ tripId, token: urlToken }: Props) {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-stone-900">{trip.name}</h1>
-        <p className="mt-1 text-stone-600">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">{trip.name}</h1>
+        <p className="mt-1 text-slate-600">
           {plural(trip.tripLength, "day")} somewhere between {formatRange(trip.windowStart, trip.windowEnd)}. Takes about 2 minutes.
         </p>
       </div>
@@ -197,17 +197,17 @@ export function PreferenceForm({ tripId, token: urlToken }: Props) {
           {/* Name */}
           <Card>
             {editMode && me ? (
-              <p className="text-stone-700">
-                Editing as <strong className="text-stone-900">{me.participant.name}</strong>
+              <p className="text-slate-700">
+                Editing as <strong className="text-slate-900">{me.participant.name}</strong>
               </p>
             ) : (
               <fieldset>
-                <legend className="font-medium text-stone-900">Who are you?</legend>
+                <legend className="font-medium text-slate-900">Who are you?</legend>
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {trip.participants.map((p) => (
                     <label
                       key={p.id}
-                      className={`flex cursor-pointer items-center justify-between gap-2 rounded-xl border px-3 py-2.5 has-[:checked]:border-teal-700 has-[:checked]:bg-teal-50 has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-teal-700 ${p.submitted ? "border-stone-200 bg-stone-50 text-stone-500" : "border-stone-300"}`}
+                      className={`flex cursor-pointer items-center justify-between gap-2 rounded-xl border px-3 py-2.5 has-[:checked]:border-brand-700 has-[:checked]:bg-brand-50 has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-brand-700 ${p.submitted ? "border-slate-200 bg-slate-50 text-slate-500" : "border-slate-300"}`}
                     >
                       <span className="flex items-center gap-2">
                         <input type="radio" name="participant" value={p.id} checked={participantId === p.id} onChange={() => setParticipantId(p.id)} className="sr-only" />
@@ -261,7 +261,7 @@ export function PreferenceForm({ tripId, token: urlToken }: Props) {
                   className="flex-1"
                 />
                 <div className="relative w-32">
-                  <span aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-stone-500">₹</span>
+                  <span aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
                   <input
                     id="budget"
                     type="number"
@@ -286,11 +286,11 @@ export function PreferenceForm({ tripId, token: urlToken }: Props) {
           {/* Dealbreakers */}
           <Card className="space-y-4">
             <fieldset>
-              <legend className="font-medium text-stone-900">Dealbreakers (hard no&apos;s)</legend>
-              <p className="text-sm text-stone-500">Any option that breaks one of these is dropped for the whole group. Only tick real no&apos;s.</p>
+              <legend className="font-medium text-slate-900">Dealbreakers (hard no&apos;s)</legend>
+              <p className="text-sm text-slate-500">Any option that breaks one of these is dropped for the whole group. Only tick real no&apos;s.</p>
               <div className="mt-3 space-y-2">
                 {DEALBREAKERS.map((d) => (
-                  <label key={d} className="flex cursor-pointer items-center gap-3 rounded-xl border border-stone-200 px-3 py-2.5 has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50">
+                  <label key={d} className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 px-3 py-2.5 has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50">
                     <input
                       type="checkbox"
                       className="h-5 w-5 accent-orange-600"
@@ -329,15 +329,15 @@ function WontGoPicker({ destinations, value, onChange }: { destinations: Destina
   const shown = destinations.filter((d) => `${d.name} ${d.state}`.toLowerCase().includes(q.toLowerCase()));
   const names = value.map((id) => destinations.find((d) => d.id === id)?.name ?? id);
   return (
-    <details className="rounded-xl border border-stone-200 px-3 py-2.5" open={value.length > 0}>
-      <summary className="cursor-pointer font-medium text-stone-900">
-        Places I won&apos;t go {value.length > 0 && <span className="text-sm font-normal text-stone-600">({names.join(", ")})</span>}
+    <details className="rounded-xl border border-slate-200 px-3 py-2.5" open={value.length > 0}>
+      <summary className="cursor-pointer font-medium text-slate-900">
+        Places I won&apos;t go {value.length > 0 && <span className="text-sm font-normal text-slate-600">({names.join(", ")})</span>}
       </summary>
       <div className="mt-3 space-y-2">
         <input type="search" aria-label="Search destinations" placeholder="Search…" className={input} value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="max-h-64 space-y-1 overflow-y-auto pr-1">
           {shown.map((d) => (
-            <label key={d.id} className="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-stone-50">
+            <label key={d.id} className="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-slate-50">
               <input
                 type="checkbox"
                 className="h-4 w-4 accent-orange-600"
@@ -345,11 +345,11 @@ function WontGoPicker({ destinations, value, onChange }: { destinations: Destina
                 onChange={(e) => onChange(e.target.checked ? [...value, d.id] : value.filter((x) => x !== d.id))}
               />
               <span>
-                {d.name} <span className="text-sm text-stone-500">· {d.state}</span>
+                {d.name} <span className="text-sm text-slate-500">· {d.state}</span>
               </span>
             </label>
           ))}
-          {shown.length === 0 && <p className="px-2 text-sm text-stone-500">No matches.</p>}
+          {shown.length === 0 && <p className="px-2 text-sm text-slate-500">No matches.</p>}
         </div>
       </div>
     </details>

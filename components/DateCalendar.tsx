@@ -32,15 +32,15 @@ export function DateCalendar({
 
   return (
     <fieldset>
-      <legend className="font-medium text-stone-900">Dates you CAN travel</legend>
-      <p className="text-sm text-stone-500">
+      <legend className="font-medium text-slate-900">Dates you CAN travel</legend>
+      <p className="text-sm text-slate-500">
         Tap every day you&apos;re free. We need {tripLength} days in a row that work for everyone.
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
         <button type="button" className={btn.small} onClick={() => onChange(all)}>Select all</button>
         <button type="button" className={btn.small} onClick={() => onChange([...new Set([...selected, ...weekends])].sort())}>+ Fri–Sun</button>
         <button type="button" className={btn.small} onClick={() => onChange([])}>Clear</button>
-        <span className="self-center text-sm text-stone-600" aria-live="polite">
+        <span className="self-center text-sm text-slate-600" aria-live="polite">
           {selected.length} of {all.length} days selected
         </span>
       </div>
@@ -54,16 +54,16 @@ export function DateCalendar({
           for (let d = 1; d <= daysInMonth; d++) cells.push(`${key}-${String(d).padStart(2, "0")}`);
           return (
             <div key={key}>
-              <p className="mb-2 text-sm font-semibold text-stone-800">{MONTH_NAMES[m - 1]} {y}</p>
+              <p className="mb-2 text-sm font-semibold text-slate-800">{MONTH_NAMES[m - 1]} {y}</p>
               <div className="grid grid-cols-7 gap-1 text-center" role="group" aria-label={`${MONTH_NAMES[m - 1]} ${y}`}>
                 {WEEKDAYS.map((w, i) => (
-                  <span key={i} aria-hidden className="text-xs font-medium text-stone-400">{w}</span>
+                  <span key={i} aria-hidden className="text-xs font-medium text-slate-400">{w}</span>
                 ))}
                 {cells.map((d, i) => {
                   if (!d) return <span key={`e${i}`} />;
                   const day = Number(d.slice(8));
                   if (!inMonth.has(d)) {
-                    return <span key={d} aria-hidden className="py-2 text-sm text-stone-300">{day}</span>;
+                    return <span key={d} aria-hidden className="py-2 text-sm text-slate-300">{day}</span>;
                   }
                   const on = sel.has(d);
                   return (
@@ -73,7 +73,7 @@ export function DateCalendar({
                       aria-pressed={on}
                       aria-label={`${day} ${MONTH_NAMES[m - 1]}${on ? ", available" : ""}`}
                       onClick={() => toggle(d)}
-                      className={`rounded-lg py-2 text-sm font-medium transition-colors ${on ? "bg-teal-700 text-white hover:bg-teal-800" : "bg-stone-100 text-stone-800 hover:bg-stone-200"}`}
+                      className={`rounded-lg py-2 text-sm font-medium transition-colors ${on ? "bg-brand-700 text-white hover:bg-brand-800" : "bg-slate-100 text-slate-800 hover:bg-slate-200"}`}
                     >
                       {day}
                     </button>

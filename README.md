@@ -11,6 +11,15 @@ Built with Next.js (App Router) + TypeScript + Tailwind, Supabase Postgres, and 
 - Landing page → **Load demo trip**. This creates a trip with Riya, Siddharth, Karan, Aisha and Preethi, all with different preferences, so the results grid is meaningful. Your browser votes as Riya; the other four personal links are listed under the button.
 - Or from the terminal: `npm run seed:demo` prints the share, results, organizer and personal links.
 
+## Design
+
+The look follows a travel-site template: a full-bleed photo hero with a wavy edge, bright sky-blue pill buttons on deep navy, "—— EYEBROW" section labels, a tilted photo collage, a scenic banner and photo destination cards. The app keeps its own name and content.
+
+- **Theme:** `app/globals.css` (brand blue scale, `ink` navy, `mist` background), Outfit for headings and Plus Jakarta Sans for body text.
+- **Building blocks:** `components/brand.tsx` (`Wave`, `Eyebrow`, `DestPhoto`, `PageFrame`, `Logo`).
+- **Pages:** landing (`app/page.tsx`), a new filterable catalog at `/destinations`, and photo headers on the results option cards.
+- **Photos:** real photos of the destinations, freely licensed from Wikimedia Commons, saved in `public/photos/`. Attribution is on `/credits` (from `lib/photo-credits.json`). `node scripts/fetch-images.mjs [id…]` re-downloads them from `scripts/photo-sources.json` and only accepts CC or public-domain files.
+
 ## How each box in the components map is implemented
 
 ### 1. Collect
@@ -118,6 +127,7 @@ npm run seed:demo    # optional: prints links for a demo trip
 | `npm run seed:demo` | Creates the 5-friend demo trip and prints its links |
 | `npm run seed:catalog` | Upserts the destination catalog via the service key |
 | `npm run gen:seed` | Regenerates `supabase/seed.sql` from `lib/catalog-data.ts` |
+| `node scripts/fetch-images.mjs` | Re-downloads destination photos and credits from Wikimedia Commons |
 
 ### Environment variables
 

@@ -26,9 +26,9 @@ export function CompletionTracker({ trip }: { trip: TripPublic }) {
     <Card className="space-y-4">
       <div className="flex items-end justify-between gap-3">
         <div>
-          <h2 className="font-semibold text-stone-900">Who&apos;s in</h2>
-          <p className="text-3xl font-bold text-stone-900">
-            {trip.submittedCount}/{trip.total} <span className="text-base font-medium text-stone-600">submitted</span>
+          <h2 className="font-semibold text-slate-900">Who&apos;s in</h2>
+          <p className="text-3xl font-bold text-slate-900">
+            {trip.submittedCount}/{trip.total} <span className="text-base font-medium text-slate-600">submitted</span>
           </p>
         </div>
         {trip.resultsAvailable && (
@@ -37,12 +37,12 @@ export function CompletionTracker({ trip }: { trip: TripPublic }) {
           </Link>
         )}
       </div>
-      <div className="h-3 overflow-hidden rounded-full bg-stone-100" role="progressbar" aria-valuenow={trip.submittedCount} aria-valuemin={0} aria-valuemax={trip.total} aria-label="Submissions">
-        <div className="h-full rounded-full bg-teal-700 transition-all" style={{ width: `${pct}%` }} />
+      <div className="h-3 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-valuenow={trip.submittedCount} aria-valuemin={0} aria-valuemax={trip.total} aria-label="Submissions">
+        <div className="h-full rounded-full bg-brand-700 transition-all" style={{ width: `${pct}%` }} />
       </div>
       <ul className="flex flex-wrap gap-2">
         {trip.participants.map((p) => (
-          <li key={p.id} className={`rounded-full px-3 py-1 text-sm font-medium ${p.submitted ? "bg-emerald-100 text-emerald-900" : "border border-dashed border-stone-300 text-stone-600"}`}>
+          <li key={p.id} className={`rounded-full px-3 py-1 text-sm font-medium ${p.submitted ? "bg-emerald-100 text-emerald-900" : "border border-dashed border-slate-300 text-slate-600"}`}>
             {p.submitted ? "✓ " : "… "}
             {p.name}
             <span className="sr-only">{p.submitted ? " (submitted)" : " (not yet)"}</span>
@@ -60,7 +60,7 @@ export function CompletionTracker({ trip }: { trip: TripPublic }) {
         </Notice>
       ) : (
         <>
-          <p className="text-sm text-stone-700">
+          <p className="text-sm text-slate-700">
             Waiting on <strong>{listNames(missing.map((p) => p.name))}</strong>. Submissions close on{" "}
             {formatDeadline(trip.deadline)}. {plural(missing.length, "person", "people")} still to go. Results stay locked until
             everyone&apos;s in or the deadline passes.

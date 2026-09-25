@@ -64,15 +64,15 @@ export function AdminView({ tripId, orgKey }: { tripId: string; orgKey: string |
   return (
     <div className="space-y-5">
       <div>
-        <p className="text-sm font-medium text-teal-700">Organizer view</p>
-        <h1 className="text-2xl font-bold tracking-tight text-stone-900">{trip.name}</h1>
+        <p className="text-sm font-medium text-brand-700">Organizer view</p>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">{trip.name}</h1>
       </div>
 
       <DecisionBanner trip={trip} people={data.people ?? []} />
       <CompletionTracker trip={trip} />
 
       <Card className="space-y-4">
-        <h2 className="font-semibold text-stone-900">Links</h2>
+        <h2 className="font-semibold text-slate-900">Links</h2>
         <LinkBox label="Share link (for the group)" url={links.share(tripId)} />
         <LinkBox label="Status page (safe to share)" url={links.status(tripId)} />
         <LinkBox label="Results page" url={links.results(tripId)} />
@@ -80,7 +80,7 @@ export function AdminView({ tripId, orgKey }: { tripId: string; orgKey: string |
 
       {!data.locked && !trip.decided && (
         <Card className="space-y-3">
-          <h2 className="font-semibold text-stone-900">Final decision</h2>
+          <h2 className="font-semibold text-slate-900">Final decision</h2>
           {options.length === 0 ? (
             <Notice tone="warn">No destination passes everyone&apos;s filters, so there&apos;s nothing to vote on yet. See the results page for what&apos;s blocking.</Notice>
           ) : (
@@ -89,13 +89,13 @@ export function AdminView({ tripId, orgKey }: { tripId: string; orgKey: string |
                 {options.map((o) => (
                   <li key={o.destinationId} className="flex justify-between gap-3">
                     <span>
-                      {o.name} <span className="text-stone-500">· score {o.groupScore}{o.window ? ` · ${formatRange(o.window.start, o.window.end)}` : ""}</span>
+                      {o.name} <span className="text-slate-500">· score {o.groupScore}{o.window ? ` · ${formatRange(o.window.start, o.window.end)}` : ""}</span>
                     </span>
                     <strong className="tabular-nums">{votes?.counts[o.destinationId] ?? 0}</strong>
                   </li>
                 ))}
               </ul>
-              <p className="text-sm text-stone-700">
+              <p className="text-sm text-slate-700">
                 {votes?.voted.length}/{(data.people ?? []).length} voted.{" "}
                 {votes && votes.notVoted.length > 0 ? <>Waiting on {listNames(votes.notVoted)}.</> : "Everyone has voted."}{" "}
                 {leader && <>Locking now picks <strong>{leader.name}</strong>{votes?.totalVotes ? "" : " (highest group score, no votes yet)"}.</>}
@@ -120,7 +120,7 @@ export function AdminView({ tripId, orgKey }: { tripId: string; orgKey: string |
               {lockError && <Notice tone="error">{lockError}</Notice>}
             </>
           )}
-          <Link href={`/t/${tripId}/results`} className="inline-block text-sm font-medium text-teal-800 underline">Open full results →</Link>
+          <Link href={`/t/${tripId}/results`} className="inline-block text-sm font-medium text-brand-800 underline">Open full results →</Link>
         </Card>
       )}
     </div>

@@ -1,27 +1,52 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --font-display: var(--font-outfit), var(--font-jakarta), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
+}
+
+/* Palette taken from the travel template: bright sky blue on deep navy. */
+@theme {
+  --color-brand-50: #eff8ff;
+  --color-brand-100: #dbeefe;
+  --color-brand-200: #bfe2fe;
+  --color-brand-300: #93cffd;
+  --color-brand-400: #60b4fa;
+  --color-brand-500: #2b95f5;
+  --color-brand-600: #0f78e0;
+  --color-brand-700: #0b61b8;
+  --color-brand-800: #0f5194;
+  --color-brand-900: #12437a;
+  --color-ink: #0b2545;
+  --color-mist: #f4f8fc;
 }
 
 :root {
   color-scheme: light;
 }
 
-body {
-  background: #f7f6f2;
-  color: #1c1917;
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+@layer base {
+  body {
+    background: var(--color-mist);
+    color: #1e293b;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    color: var(--color-ink);
+  }
 }
 
 /* Visible keyboard focus everywhere. */
 :focus-visible {
-  outline: 3px solid #0f766e;
+  outline: 3px solid var(--color-brand-500);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 input[type="range"] {
-  accent-color: #0f766e;
+  accent-color: var(--color-brand-600);
 }

@@ -31,15 +31,15 @@ export function CopyButton({ text, label = "Copy", className = btn.small }: { te
 export function LinkBox({ label, url, hint }: { label: string; url: string; hint?: string }) {
   return (
     <div className="space-y-1.5">
-      <p className="text-sm font-medium text-stone-900">{label}</p>
-      {hint && <p className="text-xs text-stone-500">{hint}</p>}
+      <p className="text-sm font-medium text-slate-900">{label}</p>
+      {hint && <p className="text-xs text-slate-500">{hint}</p>}
       <div className="flex gap-2">
         <input
           readOnly
           value={url}
           aria-label={label}
           onFocus={(e) => e.currentTarget.select()}
-          className="min-w-0 flex-1 rounded-lg border border-stone-300 bg-stone-50 px-3 py-2 font-mono text-xs text-stone-700"
+          className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 font-mono text-xs text-slate-700"
         />
         <CopyButton text={url} />
       </div>

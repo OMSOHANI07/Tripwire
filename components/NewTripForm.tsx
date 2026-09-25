@@ -58,7 +58,7 @@ export function NewTripForm() {
           <div className="flex flex-wrap gap-2">
             <CopyButton text={msg} label="Copy WhatsApp message" className={btn.secondary} />
           </div>
-          <hr className="border-stone-200" />
+          <hr className="border-slate-200" />
           <LinkBox
             label="Your organizer link (private)"
             url={links.admin(created.tripId, created.organizerKey)}
@@ -87,14 +87,14 @@ export function NewTripForm() {
         </Field>
 
         <fieldset className="space-y-1.5">
-          <legend className="font-medium text-stone-900">Possible dates</legend>
-          <p className="text-sm text-stone-500">The widest window you&apos;d consider. Friends pick the days they can make inside it.</p>
+          <legend className="font-medium text-slate-900">Possible dates</legend>
+          <p className="text-sm text-slate-500">The widest window you&apos;d consider. Friends pick the days they can make inside it.</p>
           <div className="grid grid-cols-2 gap-3">
-            <label className="text-sm text-stone-700">
+            <label className="text-sm text-slate-700">
               From
               <input type="date" className={`${input} mt-1`} value={windowStart} min={isoDate(today)} onChange={(e) => setWindowStart(e.target.value)} />
             </label>
-            <label className="text-sm text-stone-700">
+            <label className="text-sm text-slate-700">
               To
               <input type="date" className={`${input} mt-1`} value={windowEnd} min={windowStart} onChange={(e) => setWindowEnd(e.target.value)} />
             </label>
@@ -115,14 +115,14 @@ export function NewTripForm() {
         </Field>
 
         <fieldset className="space-y-1.5">
-          <legend className="font-medium text-stone-900">Submission deadline (IST)</legend>
-          <p className="text-sm text-stone-500">Answers freeze at this time. Results unlock once everyone&apos;s in, or at the deadline.</p>
+          <legend className="font-medium text-slate-900">Submission deadline (IST)</legend>
+          <p className="text-sm text-slate-500">Answers freeze at this time. Results unlock once everyone&apos;s in, or at the deadline.</p>
           <div className="grid grid-cols-2 gap-3">
-            <label className="text-sm text-stone-700">
+            <label className="text-sm text-slate-700">
               Date
               <input type="date" className={`${input} mt-1`} value={deadlineDate} min={isoDate(today)} onChange={(e) => setDeadlineDate(e.target.value)} />
             </label>
-            <label className="text-sm text-stone-700">
+            <label className="text-sm text-slate-700">
               Time
               <input type="time" className={`${input} mt-1`} value={deadlineTime} onChange={(e) => setDeadlineTime(e.target.value)} />
             </label>
@@ -132,13 +132,13 @@ export function NewTripForm() {
 
       <Card className="space-y-3">
         <div>
-          <h2 className="font-medium text-stone-900">Who&apos;s coming?</h2>
-          <p className="text-sm text-stone-500">2 to 10 people, including you. Everyone picks their name from this list.</p>
+          <h2 className="font-medium text-slate-900">Who&apos;s coming?</h2>
+          <p className="text-sm text-slate-500">2 to 10 people, including you. Everyone picks their name from this list.</p>
         </div>
         <ol className="space-y-2">
           {people.map((p, i) => (
             <li key={i} className="flex items-center gap-2">
-              <label htmlFor={`p${i}`} className="w-6 text-right text-sm text-stone-500">
+              <label htmlFor={`p${i}`} className="w-6 text-right text-sm text-slate-500">
                 {i + 1}
                 <span className="sr-only"> participant name</span>
               </label>
